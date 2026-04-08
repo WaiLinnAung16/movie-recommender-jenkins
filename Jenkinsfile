@@ -228,9 +228,9 @@ pipeline {
                 sh """
                 . ./image_tag.env
                 
-                # Check if port 5000 is in use and clean up
+                # Check if port 5050 is in use and clean up
                 echo "Checking for port conflicts..."
-                docker ps | grep -q "0.0.0.0:5000" && docker stop \$(docker ps | grep "0.0.0.0:5000" | awk '{print \$1}') || true
+                docker ps | grep -q "0.0.0.0:5050" && docker stop \$(docker ps | grep "0.0.0.0:5050" | awk '{print \$1}') || true
                 
                 # Stop and remove existing container if it exists
                 docker stop myapp5 || true
@@ -259,7 +259,7 @@ pipeline {
                 done
                 
                 # Run the application container
-                docker run -d -p 5000:5000 \
+                docker run -d -p 5050:5050 \
                     --name myapp5 \
                     --network ${NETWORK_NAME} \
                     -e DB_URI="mysql+pymysql://root:root@mysql-db-dast:3306/imdb_db" \
@@ -276,7 +276,7 @@ pipeline {
                 
                 # Wait for app to be ready
                 for i in \$(seq 1 30); do
-                    if curl -f http://localhost:5000/ 2>/dev/null; then
+                    if curl -f http://localhost:5050/ 2>/dev/null; then
                         echo "App is ready!"
                         break
                     fi
@@ -315,7 +315,7 @@ pipeline {
                 docker run --network ${NETWORK_NAME} \
                     -v \$(pwd)/zap-reports:/zap/wrk:rw \
                     ghcr.io/zaproxy/zaproxy:stable \
-                    zap-baseline.py -t http://myapp5:5000 -r zap-report.html || echo "ZAP finished with alerts"
+                    zap-baseline.py -t http://myapp5:5050 -r zap-report.html || echo "ZAP finished with alerts"
                 """
             }
         }
