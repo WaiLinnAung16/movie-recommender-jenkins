@@ -312,8 +312,7 @@ pipeline {
                 done
                 
                 # Run ZAP scan
-                docker run --user root \
-                        --network ${NETWORK_NAME} \
+                docker run --network ${NETWORK_NAME} \
                         -v \$(pwd)/zap-reports:/zap/wrk:rw \
                         ghcr.io/zaproxy/zaproxy:stable \
                         zap-baseline.py -t http://myapp5:5050 -r zap-report.html
