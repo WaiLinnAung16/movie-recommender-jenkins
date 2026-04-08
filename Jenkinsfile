@@ -313,10 +313,12 @@ pipeline {
                 
                 # Run ZAP scan
                 docker run --user root \
-                        --network ${NETWORK_NAME} \
-                        -v \$(pwd)/zap-reports:/zap/wrk:rw \
-                        ghcr.io/zaproxy/zaproxy:stable \
-                        zap-baseline.py -t http://myapp5:5050 -r zap-report.html
+                    --network app-network \
+                    -v /var/jenkins_home/workspace/MovieRecommender@2/zap-reports:/zap/wrk:rw \
+                    ghcr.io/zaproxy/zaproxy:stable \
+                    zap-baseline.py \
+                    -t http://myapp5:5050 \
+                    -r /zap/wrk/zap-report.html
                 """
             }
         }
