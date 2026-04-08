@@ -291,7 +291,7 @@ pipeline {
             steps {
                 sh """
                 mkdir -p zap-reports
-                chmod 777 zap-reports
+                chmod -R 777 zap-reports
                 
                 # Pull ZAP image with retry
                 max_retries=3
@@ -312,8 +312,9 @@ pipeline {
                 done
                 
                 # Run ZAP scan
-                docker run --network ${NETWORK_NAME} \
-                    -v \$(pwd)/zap-reports:/zap/wrk:rw \
+                docker run --user root \
+                    --network ${NETWORK_NAME} \
+                    -v $(pwd)/zap-reports:/zap/wrk:rw \
                     ghcr.io/zaproxy/zaproxy:stable \
                     zap-baseline.py -t http://myapp5:5050 -r zap-report.html || echo "ZAP finished with alerts"
                 """
