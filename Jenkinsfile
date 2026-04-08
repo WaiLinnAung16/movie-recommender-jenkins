@@ -229,7 +229,7 @@ pipeline {
                 . ./image_tag.env
                 
                 # Run the application container
-                docker run -d -p 5000:8000 \
+                docker run -d -p 5050:8000 \
                     --name myapp5 \
                     --network ${NETWORK_NAME} \
                     -e DB_URI="mysql+pymysql://root:root@mysql-db-dast:3306/imdb_db" \
@@ -246,7 +246,7 @@ pipeline {
                 
                 # Wait for app to be ready
                 for i in \$(seq 1 30); do
-                    if curl -f http://localhost:5000/ 2>/dev/null; then
+                    if curl -f http://localhost:5050/ 2>/dev/null; then
                         echo "App is ready!"
                         break
                     fi
