@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "myapp4"
+        IMAGE_NAME = "myapp5"
         // Use localhost for host-based tests, container name for Docker-based tests
         DB_URI = "mysql+pymysql://root:root@localhost:3306/imdb_db"
         DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials')
@@ -233,8 +233,8 @@ pipeline {
                 docker ps | grep -q "0.0.0.0:5000" && docker stop \$(docker ps | grep "0.0.0.0:5000" | awk '{print \$1}') || true
                 
                 # Stop and remove existing container if it exists
-                docker stop myapp3 || true
-                docker rm myapp3 || true
+                docker stop myapp5 || true
+                docker rm myapp5 || true
                 
                 # Stop and remove MySQL DAST container if it exists
                 docker stop mysql-db-dast || true
@@ -260,7 +260,7 @@ pipeline {
                 
                 # Run the application container
                 docker run -d -p 5000:5000 \
-                    --name myapp3 \
+                    --name myapp5 \
                     --network ${NETWORK_NAME} \
                     -e DB_URI="mysql+pymysql://root:root@mysql-db-dast:3306/imdb_db" \
                     -e ADMIN_USERNAME="admin" \
@@ -272,7 +272,7 @@ pipeline {
                 sleep 30
                 
                 # Check if app is running
-                docker logs myapp3 || true
+                docker logs myapp5 || true
                 
                 # Wait for app to be ready
                 for i in \$(seq 1 30); do
@@ -315,7 +315,7 @@ pipeline {
                 docker run --network ${NETWORK_NAME} \
                     -v \$(pwd)/zap-reports:/zap/wrk:rw \
                     ghcr.io/zaproxy/zaproxy:stable \
-                    zap-baseline.py -t http://myapp3:5000 -r zap-report.html || echo "ZAP finished with alerts"
+                    zap-baseline.py -t http://myapp5:5000 -r zap-report.html || echo "ZAP finished with alerts"
                 """
             }
         }
@@ -329,8 +329,8 @@ pipeline {
             // Cleanup
             sh '''
             echo "Cleaning up containers..."
-            docker stop myapp3 || true
-            docker rm myapp3 || true
+            docker stop myapp5 || true
+            docker rm myapp5 || true
             docker stop mysql-db || true
             docker rm mysql-db || true
             docker stop mysql-db-dast || true
@@ -347,8 +347,8 @@ pipeline {
         failure {
             // Capture logs on failure
             sh '''
-            echo "=== Docker logs for myapp3 ==="
-            docker logs myapp3 || true
+            echo "=== Docker logs for myapp5 ==="
+            docker logs myapp5 || true
             echo "=== Docker logs for mysql-db ==="
             docker logs mysql-db || true
             echo "=== Docker logs for mysql-db-dast ==="
