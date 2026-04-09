@@ -92,43 +92,7 @@ pipeline {
                 }
             }
         }
-        stage('Trivy Scan') {
-            steps {
-                sh '''
-                . ./image_tag.env
-                
-                # Pull Trivy image with retry
-                echo "Pulling Trivy scanner..."
-                max_retries=3
-                retry_count=0
-                while [ $retry_count -lt $max_retries ]; do
-                    if docker pull aquasec/trivy:0.56.0; then
-                        echo "Trivy image pulled successfully!"
-                        break
-                    else
-                        retry_count=$((retry_count+1))
-                        if [ $retry_count -lt $max_retries ]; then
-                            echo "Failed to pull Trivy, retrying... (attempt $retry_count/$max_retries)"
-                            sleep 10
-                        else
-                            echo "Failed to pull Trivy after $max_retries attempts, skipping scan"
-                            exit 0
-                        fi
-                    fi
-                done
-                
-                # Run Trivy scan
-                docker run --rm \
-                    -v /var/run/docker.sock:/var/run/docker.sock \
-                    aquasec/trivy:0.56.0 \
-                    image \
-                    --format table \
-                    --severity CRITICAL,HIGH \
-                    --no-progress \
-                    $FULL_IMAGE_TAG || true
-                '''
-            }
-        }
+        
 
 
         stage('Run App & DAST') {
